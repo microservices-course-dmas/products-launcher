@@ -7,3 +7,9 @@
 [submodule "products-ms"]
 	path = products-ms
 	url = https://github.com/microservices-course-dmas/products-ms.git
+[submodule "payments-ms"]
+	path = payments-ms
+	url = https://github.com/microservices-course-dmas/payments-ms.git
+[submodule "auth-ms"]
+	path = auth-ms
+	url = https://github.com/microservices-course-dmas/auth-ms.git
