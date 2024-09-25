@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+  nats-server:
+    image: nats:latest
+  #   ports:
+  #     - 8222:8222
+
+  client-gateway:
+    build:
+      context: ./client-gateway
+      dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/ms-products-launcher/image-registry/client-gateway
+    ports:
+      - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
+    # command: npm run start:dev
+    environment:
+      - PORT=${CLIENT_GATEWAY_PORT}
+      - NATS_SERVERS=${NATS_SERVERS}
+
+  products-ms:
+    build:
+      context: ./products-ms
+      dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/ms-products-launcher/image-registry/products-ms
+    environment:
+      - PORT=3001
+      - NATS_SERVERS=${NATS_SERVERS}
+      - DATABASE_URL=file:./dev.db      
+
+
+  orders-ms:    
+    build:
+      context: ./orders-ms
+      dockerfile: dockerfile.prod
+      args:
+        - ORDERS_DATABASE_URL=${ORDERS_DATABASE_URL}
+    image: southamerica-west1-docker.pkg.dev/ms-products-launcher/image-registry/orders-ms
+    environment:
+      - PORT=3002
+      - NATS_SERVERS=${NATS_SERVERS}
+      - DATABASE_URL=${ORDERS_DATABASE_URL}
+
+  # #===============================#
+  # #     Payments Microservice     #
+  # #===============================#
+  payments-ms:
+    build:
+      context: ./payments-ms
+      dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/ms-products-launcher/image-registry/payments-ms
+    ports:
+      - 3003:3003
+    environment:
+      - PORT=3003
+      - NATS_SERVERS=${NATS_SERVERS}
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - ENDPOINT_SECRET=${ENDPOINT_SECRET}
+      - URL_SUCCESS=${URL_SUCCESS}
+      - URL_CANCEL=${URL_CANCEL}
+
+  auth-ms:
+    build:
+      context: ./auth-ms
+      dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/ms-products-launcher/image-registry/auth-ms
+    environment:
+      - PORT=3004
+      - NATS_SERVERS=${NATS_SERVERS}
+      - DATABASE_URL=${AUTH_DB_URL}
+      - JWT_SECRET=${JWT_SECRET}

@@ -40,3 +40,7 @@ Si se hace al revés, se perderán las referencias de los sub-módulos en el rep
 
 #### upload forwarder
 `$ npx hookdeck listen 3003 stripe-to-localhost2`
+
+
+#### crear docker prod
+`$ docker compose -f docker-compose.prod.yml build`
